@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity" />-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="6"
+    tools:context=".ValuesScreen">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.25"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/accelerationCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/acceleration"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Acceleration" />
+
+            <TextView
+                android:id="@+id/accelerationValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/accelerationUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/accelerationUnits" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/currentSpeedCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/currentSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Current_Speed" />
+
+            <TextView
+                android:id="@+id/currentSpeedValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/currentSpeedUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/speedUnits" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.25"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/maxSpeedCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/maxSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Max_Speed" />
+
+            <TextView
+                android:id="@+id/maxSpeedValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/maxSpeedUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/speedUnits" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/avgSpeedCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/avgSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Avg_Speed" />
+
+            <TextView
+                android:id="@+id/avgSpeedValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/speedUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/speedUnits" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.25"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/timeCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Time" />
+
+            <TextView
+                android:id="@+id/timeValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/timeUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/timeUnits" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/distanceCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Distance_Travelled" />
+
+            <TextView
+                android:id="@+id/distanceValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/distanceUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/distanceUnits" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.25"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/angleCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/angle"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Angle" />
+
+            <TextView
+                android:id="@+id/angleValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/angleUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/angleUnits" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/distanceToCorner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/distanceTo"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center_horizontal"
+                android:textSize="18sp"
+                android:text="@string/Distance_To" />
+
+            <TextView
+                android:id="@+id/distanceToValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="0.00" />
+
+            <TextView
+                android:id="@+id/distanceToUnits"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="top|center_horizontal"
+                android:text="@string/distanceUnits" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:weightSum="4">
+        <Button
+            android:id="@+id/valuesToMapButton"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:text="Map"
+            android:onClick="valuesToMap"/>
+        <Button
+            android:id="@+id/valuesToSettingsButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Settings"
+            android:onClick="valuesToSettings"/>
+    </LinearLayout>
+
+</LinearLayout>

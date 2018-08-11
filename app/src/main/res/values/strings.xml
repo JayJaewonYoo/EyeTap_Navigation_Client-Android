@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">EyeTap: Bike</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="Acceleration">Acceleration</string>
+    <string name="Current_Speed">Current Speed</string>
+    <string name="Max_Speed">Max Speed</string>
+    <string name="Distance_Travelled">Distance Travelled</string>
+    <string name="Time">Time</string>
+    <string name="Angle">Angle</string>
+    <string name="Distance_To">Distance To</string>
+    <string name="Avg_Speed">Average Speed</string>
+    <string name="buttonStart">Start</string>
+    <string name="buttonStop">Stop</string>
+    <string name="startLocation">Starting Location</string>
+    <string name="stopLocation">End Location</string>
+
+    <!--Units:-->
+    <string name="accelerationUnits">m/s<small><sup>2</sup></small></string>
+    <string name="speedUnits">m/s</string>
+    <string name="distanceUnits">m</string>
+    <string name="timeUnits">s</string>
+    <string name="angleUnits">degrees</string>
+</resources>

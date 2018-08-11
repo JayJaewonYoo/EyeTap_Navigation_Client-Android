@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity" />-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="6"
+    tools:context=".SettingsScreen">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="vertical" />
+
+    <LinearLayout
+        android:name="checkboxes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:weightSum="3.4"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:gravity="left"
+            android:text="Choose parameters to send to EyeTap:"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="3"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/accelerationCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Acceleration"
+                android:onClick="onAccelerationClick">
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/currSpeedCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Current_Speed"
+                android:onClick="onCurrSpeedClick">
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/maxSpeedCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Max_Speed"
+                android:onClick="onMaxSpeedClick">
+            </CheckBox>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:weightSum="3"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/avgSpeedCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Avg_Speed"
+                android:onClick="onAvgSpeedClick">
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/timeCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Time"
+                android:onClick="onTimeClick">
+            </CheckBox>
+
+            <CheckBox
+                android:id="@+id/distanceCheckbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/Distance_Travelled"
+                android:onClick="onDistanceClick">
+            </CheckBox>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight = "1"
+        android:weightSum="4">
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:text="Map"
+            android:onClick="settingsToMap"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Values"
+            android:onClick="settingsToValues"/>
+    </LinearLayout>
+</LinearLayout>
