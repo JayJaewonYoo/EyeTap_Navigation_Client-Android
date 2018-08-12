@@ -1,7 +1,9 @@
 package com.jayjaewonyoo.jy476.bike_eyetap;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -84,5 +86,14 @@ public class SettingsScreen extends Activity {
         MapsActivity.distanceChecked = !MapsActivity.distanceChecked;
         editor.putBoolean("distancePreference", MapsActivity.distanceChecked);
         editor.commit();
+    }
+
+    public void enableDiscoverable(View view) {
+        MapsActivity.bluetoothSend = true;
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        startActivity(discoverableIntent);
+        IntentFilter intentFilter = new IntentFilter(MapsActivity.bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        registerReceiver(MapsActivity.bluetoothBroadcastReceiver2, intentFilter);
     }
 }

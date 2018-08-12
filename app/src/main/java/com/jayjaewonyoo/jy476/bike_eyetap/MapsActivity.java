@@ -121,8 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static boolean distanceChecked;
 
     public static boolean bluetoothSend;
-    BluetoothAdapter bluetoothAdapter;
-    private final BroadcastReceiver bluetoothBroadcastReceiver1 = new BroadcastReceiver() {
+    public static BluetoothAdapter bluetoothAdapter;
+    public static BroadcastReceiver bluetoothBroadcastReceiver1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(bluetoothAdapter.ACTION_STATE_CHANGED)) {
@@ -136,6 +136,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         break;
                     case BluetoothAdapter.STATE_TURNING_ON:
+                        break;
+                }
+            }
+        }
+    };
+    public static BroadcastReceiver bluetoothBroadcastReceiver2 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if(action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+
+                switch(mode) {
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                        Log.d("Enable Discoverable", "Enabled.");
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_NONE:
+                        break;
+                    case BluetoothAdapter.STATE_CONNECTING:
+                        break;
+                    case BluetoothAdapter.STATE_CONNECTED:
                         break;
                 }
             }
@@ -221,14 +245,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 bluetoothSend = true;
                             }
 
-                            /*TextView accelerationValue = findViewById(R.id.accelerationValue);
-                            TextView currSpeedValue = findViewById(R.id.currentSpeedValue);
-                            TextView maxSpeedValue = findViewById(R.id.maxSpeedValue);
-                            TextView distanceValue = findViewById(R.id.distanceValue);
-                            accelerationValue.setText("0.00");
-                            currSpeedValue.setText("0.00");
-                            maxSpeedValue.setText("0.00");
-                            distanceValue.setText("0.00");*/
                             acceleration = "0.00";
                             currSpeed = "0.00";
                             maxSpeed = "0.00";
@@ -265,6 +281,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(bluetoothBroadcastReceiver1);
+        unregisterReceiver(bluetoothBroadcastReceiver2);
     }
 
     @Override
@@ -327,10 +344,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        /*// Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
         if(locationPermissionGranted) {
             getCurrLocation();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -562,16 +575,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             avgSpeed = intent.getStringExtra("avgSpeed");
             time = intent.getStringExtra("time");
 
-            /*TextView accelerationValue = findViewById(R.id.accelerationValue);
-            TextView currSpeedValue = findViewById(R.id.currentSpeedValue);
-            TextView maxSpeedValue = findViewById(R.id.maxSpeedValue);
-            TextView distanceValue = findViewById(R.id.distanceValue);
-
-            accelerationValue.setText(acceleration);
-            currSpeedValue.setText(currSpeed);
-            maxSpeedValue.setText(maxSpeed);
-            distanceValue.setText(distance);*/
-
             if (locationPermissionGranted) {
                 Bundle extras = intent.getExtras();
 
@@ -609,9 +612,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 // On path:
 
-                // Testing, remove later:
-                /*currSpeedValue.setText(mapDistance);
-                maxSpeedValue.setText(mapAngle);*/
             }
         }
     }
@@ -638,14 +638,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void reset() {
-        /*TextView accelerationValue = findViewById(R.id.accelerationValue);
-        TextView currSpeedValue = findViewById(R.id.currentSpeedValue);
-        TextView maxSpeedValue = findViewById(R.id.maxSpeedValue);
-        TextView distanceValue = findViewById(R.id.distanceValue);
-        accelerationValue.setText("0.00");
-        currSpeedValue.setText("0.00");
-        maxSpeedValue.setText("0.00");
-        distanceValue.setText("0.00");*/
         CalculationService.runningService = false;
         CalculationService.gravityCheck = false;
 
