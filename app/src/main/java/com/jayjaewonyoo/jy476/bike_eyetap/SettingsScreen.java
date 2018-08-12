@@ -24,9 +24,11 @@ public class SettingsScreen extends Activity {
 
     SharedPreferences.Editor editor;
 
-    public static ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<>();
+    Handler handler = new Handler();
+
     private BluetoothList bluetoothList;
     ListView listViewBluetoothDevices;
+    private boolean receiverRegistered;
 
     private BroadcastReceiver bluetoothBroadcastReceiver3 = new BroadcastReceiver() {
         @Override
@@ -36,10 +38,23 @@ public class SettingsScreen extends Activity {
 
             if(action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                bluetoothDevices.add(device);
-                Log.d("Bluetooth", "Received address: " + device.getAddress());
-                bluetoothList = new BluetoothList(context, R.layout.bluetooth_devices_view, bluetoothDevices);
-                listViewBluetoothDevices.setAdapter(bluetoothList);
+                boolean validAddition = true;
+
+                for(int i = 0; i < MapsActivity.bluetoothAddressesShown.size(); i++) {
+                    if(MapsActivity.bluetoothAddressesShown.get(i).equals(device.getAddress())) {
+                        Log.d("Bluetooth Test", "Already found: " + device.getAddress());
+                        validAddition = false;
+                        break;
+                    }
+                }
+                if(validAddition) {
+                    MapsActivity.bluetoothDevices.add(device);
+                    MapsActivity.bluetoothAddressesShown.add(device.getAddress());
+                    Log.d("Bluetooth", "Received address: " + device.getAddress());
+
+                    bluetoothList = new BluetoothList(context, R.layout.bluetooth_devices_view, MapsActivity.bluetoothDevices);
+                    listViewBluetoothDevices.setAdapter(bluetoothList);
+                }
             }
         }
     };
@@ -67,10 +82,31 @@ public class SettingsScreen extends Activity {
         distanceCheckbox.setChecked(MapsActivity.distanceChecked);
 
         listViewBluetoothDevices = (ListView)findViewById(R.id.listViewDevices);
-        bluetoothDevices = new ArrayList<>();
+        receiverRegistered = false;
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+
+                listViewBluetoothDevices.setAdapter(MapsActivity.bluetoothList);
+
+                handler.postDelayed(this, 10);
+            }
+        }, 10);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(receiverRegistered) {
+            unregisterReceiver(bluetoothBroadcastReceiver3);
+            receiverRegistered = false;
+        }
     }
 
     public void settingsToMap(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         Intent getMapActivityIntent = new Intent(this, MapsActivity.class);
         getMapActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         final int result = 1;
@@ -78,6 +114,9 @@ public class SettingsScreen extends Activity {
     }
 
     public void settingsToValues(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         Intent getValuesActivityIntent = new Intent(this, ValuesScreen.class);
         getValuesActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         final int result = 1;
@@ -121,7 +160,7 @@ public class SettingsScreen extends Activity {
     }
 
     public void discoverBluetoothButton(View view) {
-        enableDiscoverable();
+        //enableDiscoverable();
         discoverDevices();
     }
 
@@ -154,6 +193,7 @@ public class SettingsScreen extends Activity {
         MapsActivity.bluetoothAdapter.startDiscovery();
         IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
+        receiverRegistered = true;
     }
 
     private void verifyBluetoothPermissions() {
