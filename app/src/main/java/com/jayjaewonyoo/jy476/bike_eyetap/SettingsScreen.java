@@ -1,19 +1,48 @@
 package com.jayjaewonyoo.jy476.bike_eyetap;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class SettingsScreen extends Activity {
 
     SharedPreferences.Editor editor;
+
+    public static ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<>();
+    private BluetoothList bluetoothList;
+    ListView listViewBluetoothDevices;
+
+    private BroadcastReceiver bluetoothBroadcastReceiver3 = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            Log.d("Bluetooth", "Found device.");
+
+            if(action.equals(BluetoothDevice.ACTION_FOUND)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                bluetoothDevices.add(device);
+                Log.d("Bluetooth", "Received address: " + device.getAddress());
+                bluetoothList = new BluetoothList(context, R.layout.bluetooth_devices_view, bluetoothDevices);
+                listViewBluetoothDevices.setAdapter(bluetoothList);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +65,9 @@ public class SettingsScreen extends Activity {
         avgSpeedCheckbox.setChecked(MapsActivity.avgSpeedChecked);
         timeCheckbox.setChecked(MapsActivity.timeChecked);
         distanceCheckbox.setChecked(MapsActivity.distanceChecked);
+
+        listViewBluetoothDevices = (ListView)findViewById(R.id.listViewDevices);
+        bluetoothDevices = new ArrayList<>();
     }
 
     public void settingsToMap(View view) {
@@ -88,12 +120,53 @@ public class SettingsScreen extends Activity {
         editor.commit();
     }
 
-    public void enableDiscoverable(View view) {
+    public void discoverBluetoothButton(View view) {
+        enableDiscoverable();
+        discoverDevices();
+    }
+
+    public void enableDiscoverable() {
         MapsActivity.bluetoothSend = true;
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivity(discoverableIntent);
         IntentFilter intentFilter = new IntentFilter(MapsActivity.bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         registerReceiver(MapsActivity.bluetoothBroadcastReceiver2, intentFilter);
+    }
+
+    public void discoverDevices() {
+        /*if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+            verifyBluetoothPermissions();
+            MapsActivity.bluetoothAdapter.startDiscovery();
+            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
+        } else if(!MapsActivity.bluetoothAdapter.isDiscovering()) {
+            verifyBluetoothPermissions();
+            MapsActivity.bluetoothAdapter.startDiscovery();
+            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
+        }*/
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
+        verifyBluetoothPermissions();
+        MapsActivity.bluetoothAdapter.startDiscovery();
+        IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
+    }
+
+    private void verifyBluetoothPermissions() {
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            int permissionCheck = 0;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
+            }
+            if(permissionCheck != 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
+                }
+            }
+        }
     }
 }
