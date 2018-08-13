@@ -14,13 +14,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class SettingsScreen extends Activity {
+public class SettingsScreen extends Activity implements AdapterView.OnItemClickListener{
 
     SharedPreferences.Editor editor;
 
@@ -28,36 +29,6 @@ public class SettingsScreen extends Activity {
 
     private BluetoothList bluetoothList;
     ListView listViewBluetoothDevices;
-    private boolean receiverRegistered;
-
-    private BroadcastReceiver bluetoothBroadcastReceiver3 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            Log.d("Bluetooth", "Found device.");
-
-            if(action.equals(BluetoothDevice.ACTION_FOUND)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                boolean validAddition = true;
-
-                for(int i = 0; i < MapsActivity.bluetoothAddressesShown.size(); i++) {
-                    if(MapsActivity.bluetoothAddressesShown.get(i).equals(device.getAddress())) {
-                        Log.d("Bluetooth Test", "Already found: " + device.getAddress());
-                        validAddition = false;
-                        break;
-                    }
-                }
-                if(validAddition) {
-                    MapsActivity.bluetoothDevices.add(device);
-                    MapsActivity.bluetoothAddressesShown.add(device.getAddress());
-                    Log.d("Bluetooth", "Received address: " + device.getAddress());
-
-                    bluetoothList = new BluetoothList(context, R.layout.bluetooth_devices_view, MapsActivity.bluetoothDevices);
-                    listViewBluetoothDevices.setAdapter(bluetoothList);
-                }
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +53,7 @@ public class SettingsScreen extends Activity {
         distanceCheckbox.setChecked(MapsActivity.distanceChecked);
 
         listViewBluetoothDevices = (ListView)findViewById(R.id.listViewDevices);
-        receiverRegistered = false;
+        listViewBluetoothDevices.setOnItemClickListener(SettingsScreen.this);
 
         handler.postDelayed(new Runnable() {
             public void run() {
@@ -97,10 +68,6 @@ public class SettingsScreen extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(receiverRegistered) {
-            unregisterReceiver(bluetoothBroadcastReceiver3);
-            receiverRegistered = false;
-        }
     }
 
     public void settingsToMap(View view) {
@@ -130,30 +97,45 @@ public class SettingsScreen extends Activity {
     }
 
     public void onCurrSpeedClick(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         MapsActivity.currSpeedChecked = !MapsActivity.currSpeedChecked;
         editor.putBoolean("currSpeedPreference", MapsActivity.currSpeedChecked);
         editor.commit();
     }
 
     public void onMaxSpeedClick(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         MapsActivity.maxSpeedChecked = !MapsActivity.maxSpeedChecked;
         editor.putBoolean("maxSpeedPreference", MapsActivity.maxSpeedChecked);
         editor.commit();
     }
 
     public void onAvgSpeedClick(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         MapsActivity.avgSpeedChecked = !MapsActivity.avgSpeedChecked;
         editor.putBoolean("avgSpeedPreference", MapsActivity.avgSpeedChecked);
         editor.commit();
     }
 
     public void onTimeClick(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         MapsActivity.timeChecked = !MapsActivity.timeChecked;
         editor.putBoolean("timePreference", MapsActivity.timeChecked);
         editor.commit();
     }
 
     public void onDistanceClick(View view) {
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
         MapsActivity.distanceChecked = !MapsActivity.distanceChecked;
         editor.putBoolean("distancePreference", MapsActivity.distanceChecked);
         editor.commit();
@@ -170,30 +152,15 @@ public class SettingsScreen extends Activity {
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivity(discoverableIntent);
         IntentFilter intentFilter = new IntentFilter(MapsActivity.bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(MapsActivity.bluetoothBroadcastReceiver2, intentFilter);
+        registerReceiver(MapsActivity.bluetoothBroadcastReceiverEnableDiscoverable, intentFilter);
     }
 
     public void discoverDevices() {
-        /*if(MapsActivity.bluetoothAdapter.isDiscovering()) {
-            MapsActivity.bluetoothAdapter.cancelDiscovery();
-            verifyBluetoothPermissions();
-            MapsActivity.bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
-        } else if(!MapsActivity.bluetoothAdapter.isDiscovering()) {
-            verifyBluetoothPermissions();
-            MapsActivity.bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
-        }*/
         if(MapsActivity.bluetoothAdapter.isDiscovering()) {
             MapsActivity.bluetoothAdapter.cancelDiscovery();
         }
         verifyBluetoothPermissions();
         MapsActivity.bluetoothAdapter.startDiscovery();
-        IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(bluetoothBroadcastReceiver3, discoverDevicesIntent);
-        receiverRegistered = true;
     }
 
     private void verifyBluetoothPermissions() {
@@ -208,5 +175,22 @@ public class SettingsScreen extends Activity {
                 }
             }
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.d("Select Pair", "Clicked.");
+        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
+            MapsActivity.bluetoothAdapter.cancelDiscovery();
+        }
+
+        MapsActivity.bluetoothBonded = true;
+        MapsActivity.bluetoothDevices.get(i).createBond();
+        editor.putString("bluetoothAddressPreference", MapsActivity.bluetoothDevices.get(i).getAddress());
+        editor.commit();
+
+        /*if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            MapsActivity.bluetoothDevices.get(i).createBond();
+        }*/
     }
 }
