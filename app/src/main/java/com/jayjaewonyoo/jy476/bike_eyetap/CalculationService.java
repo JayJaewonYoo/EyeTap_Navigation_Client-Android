@@ -52,7 +52,7 @@ import static com.jayjaewonyoo.jy476.bike_eyetap.App.CHANNEL_ID;
 
 public class CalculationService extends Service implements SensorEventListener {
 
-    private int interval;
+    public static int interval;
 
     public static double[] acceleration = new double[3];
     private static double[] tempAcceleration = new double[3];

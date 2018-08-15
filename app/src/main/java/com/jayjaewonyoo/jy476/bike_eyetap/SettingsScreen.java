@@ -60,9 +60,9 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
 
                 listViewBluetoothDevices.setAdapter(MapsActivity.bluetoothList);
 
-                handler.postDelayed(this, 10);
+                handler.postDelayed(this, CalculationService.interval);
             }
-        }, 10);
+        }, CalculationService.interval);
     }
 
     @Override

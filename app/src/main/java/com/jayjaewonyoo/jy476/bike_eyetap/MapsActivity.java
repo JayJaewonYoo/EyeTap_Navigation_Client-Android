@@ -725,12 +725,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void discoverDevices() {
-        if(MapsActivity.bluetoothAdapter.isDiscovering()) {
-            MapsActivity.bluetoothAdapter.cancelDiscovery();
+    private void discoverDevices() {
+        if(bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
         }
-        verifyBluetoothPermissions();
-        MapsActivity.bluetoothAdapter.startDiscovery();
+        //verifyBluetoothPermissions(); // Bug here.
+        bluetoothAdapter.startDiscovery();
         IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(bluetoothBroadcastReceiverDiscover, discoverDevicesIntent);
     }
@@ -750,6 +750,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void naturalBond() {
+        if(bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
         if(preferredBluetoothAddress != "none" && !bluetoothBonded) {
             for(int i = 0; i < bluetoothAddressesShown.size(); i++) {
                 if(bluetoothAddressesShown.get(i).equals(preferredBluetoothAddress)) {
