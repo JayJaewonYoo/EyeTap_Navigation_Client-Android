@@ -38,6 +38,19 @@
                 android:text="Discover Devices"
                 android:onClick="discoverBluetoothButton" />
 
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Clear Devices"
+                android:onClick="clearBluetoothList" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/currDevice"/>
+
         </LinearLayout>
 
         <ListView

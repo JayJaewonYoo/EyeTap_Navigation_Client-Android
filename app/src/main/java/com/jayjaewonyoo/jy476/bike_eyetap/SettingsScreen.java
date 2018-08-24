@@ -30,6 +30,9 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
     private BluetoothList bluetoothList;
     ListView listViewBluetoothDevices;
 
+    private boolean listCleared;
+    TextView prefDevice;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +57,15 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
 
         listViewBluetoothDevices = (ListView)findViewById(R.id.listViewDevices);
         listViewBluetoothDevices.setOnItemClickListener(SettingsScreen.this);
+        listCleared = false;
+
+        prefDevice = findViewById(R.id.currDevice);
+        prefDevice.setText(MapsActivity.preferredBluetoothName);
 
         handler.postDelayed(new Runnable() {
             public void run() {
 
-                listViewBluetoothDevices.setAdapter(MapsActivity.bluetoothList);
+                if(!listCleared) listViewBluetoothDevices.setAdapter(MapsActivity.bluetoothList);
 
                 handler.postDelayed(this, CalculationService.interval);
             }
@@ -143,6 +150,7 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
 
     public void discoverBluetoothButton(View view) {
         //enableDiscoverable();
+        listCleared = false;
         discoverDevices();
     }
 
@@ -186,11 +194,20 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
 
         MapsActivity.bluetoothBonded = true;
         MapsActivity.bluetoothDevices.get(i).createBond();
+        editor.putString("bluetoothNamePreference", MapsActivity.bluetoothDevices.get(i).getName());
         editor.putString("bluetoothAddressPreference", MapsActivity.bluetoothDevices.get(i).getAddress());
         editor.commit();
+        prefDevice.setText(MapsActivity.bluetoothDevices.get(i).getName());
 
         /*if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
             MapsActivity.bluetoothDevices.get(i).createBond();
         }*/
+    }
+
+    public void clearBluetoothList(View view) {
+        MapsActivity.bluetoothDevices = new ArrayList<>();
+        MapsActivity.bluetoothAddressesShown = new ArrayList<>();
+        listViewBluetoothDevices.setAdapter(null);
+        listCleared = true;
     }
 }

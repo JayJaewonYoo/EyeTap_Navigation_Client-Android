@@ -5,6 +5,7 @@ import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +26,7 @@ import android.hardware.SensorEventListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,13 +42,18 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.jayjaewonyoo.jy476.bike_eyetap.App.CHANNEL_ID;
 
@@ -84,8 +91,9 @@ public class CalculationService extends Service implements SensorEventListener {
     String angleString;
     String distanceMapString;
 
-    Socket socket;
-    DataOutputStream dataOutputStream;
+    private static final UUID uuid_insecure = UUID.fromString("c9209064-3be0-40ff-868d-d8704abc7984");
+    public static BluetoothDevice currBluetoothDevice;
+    BluetoothSendClass bluetoothSendClass;
 
     @Override
     public void onCreate() {
@@ -141,12 +149,12 @@ public class CalculationService extends Service implements SensorEventListener {
         //runningService = !runningService;
         if(runningService) {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            runningService = !runningService;
         } else {
             requestLocationUpdates();
+            startBluetooth();
             directionPoints = MapsActivity.directionsLine.getPoints();
-            runningService = !runningService;
         }
+        runningService = !runningService;
         mapLine = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
 
         /*if(!running && !mapPoints.isEmpty()) {
@@ -237,7 +245,9 @@ public class CalculationService extends Service implements SensorEventListener {
             if(MapsActivity.locationPermissionGranted) {
                 //mapLine = new PolylineOptions().addAll(mapLine.getPoints()).add(currLatLng).width(5).color(Color.BLUE).geodesic(true); // Uncomment this one.
                 //MapsActivity.mMap.addPolyline(new PolylineOptions().add(tempLatLng).add(currLatLng).width(5).color(Color.BLUE).geodesic(true)); // Uncomment this one.
-                mapLine = new PolylineOptions().add(tempLatLng).add(currLatLng).width(5).color(Color.BLUE).geodesic(true);
+                if(tempLatLng != null) {
+                    mapLine = new PolylineOptions().add(tempLatLng).add(currLatLng).width(5).color(Color.BLUE).geodesic(true);
+                }
             }
             MapsActivity.mapLine = mapLine; // Uncomment this one.
 
@@ -305,6 +315,8 @@ public class CalculationService extends Service implements SensorEventListener {
             intent.putExtra("map distance", distanceMapString);
 
             tempLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+            sendBluetooth("Angle", "EyeTap_Navigation", angleString, "");
 
             sendBroadcast(intent);
         }
@@ -406,5 +418,32 @@ public class CalculationService extends Service implements SensorEventListener {
         }
 
         return res;
+    }
+
+    public void startBluetooth() {
+        bluetoothSendClass = new BluetoothSendClass(CalculationService.this);
+        if(currBluetoothDevice != null) {
+            bluetoothSendClass.startClient(currBluetoothDevice, uuid_insecure);
+        } else {
+            Log.d("Start Bluetooth Sending", "No current bluetooth device.");
+            MapsActivity.bluetoothSend = false;
+        }
+    }
+
+    private void sendBluetooth(String title, String pack, String text, String img) {
+        if(MapsActivity.bluetoothSend && MapsActivity.bluetoothBonded) {
+            JSONObject sentPackage = new JSONObject();
+            try {
+                sentPackage.put("title", title);
+                sentPackage.put("package", pack);
+                sentPackage.put("text", text);
+                sentPackage.put("img", img);
+            } catch (JSONException e) {
+
+            }
+            if (bluetoothSendClass != null) {
+                bluetoothSendClass.writeJSON(sentPackage.toString().getBytes(Charset.defaultCharset()), "notif");
+            }
+        }
     }
 }

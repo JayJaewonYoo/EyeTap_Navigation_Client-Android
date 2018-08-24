@@ -65,6 +65,7 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static android.net.NetworkCapabilities.TRANSPORT_CELLULAR;
 import static android.net.NetworkCapabilities.TRANSPORT_WIFI;
@@ -123,6 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static boolean avgSpeedChecked;
     public static boolean timeChecked;
     public static boolean distanceChecked;
+    public static String preferredBluetoothName;
     public static String preferredBluetoothAddress;
 
     public static boolean bluetoothSend; // Does user want to send Bluetooth data?
@@ -212,6 +214,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if(bondedDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Log.d("Bluetooth Pair", "Bonded.");
+
+                    // Restarting app:
+                    Intent i = getBaseContext().getPackageManager().
+                            getLaunchIntentForPackage(getBaseContext().getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
                 }
                 if(bondedDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
                     Log.d("Bluetooth Pair", "Bonding.");
@@ -240,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         avgSpeedChecked = sharedPreferences.getBoolean("avgSpeedPreference", true);
         timeChecked = sharedPreferences.getBoolean("timePreference", true);
         distanceChecked = sharedPreferences.getBoolean("distancePreference", true);
+        preferredBluetoothName = sharedPreferences.getString("bluetoothNamePreference", "none");
         preferredBluetoothAddress = sharedPreferences.getString("bluetoothAddressPreference", "none");
 
         running = false;
@@ -284,7 +294,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent = new Intent(this, CalculationService.class);
 
         bluetoothDevices = new ArrayList<>();
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        Log.d("Finding paired device", "SEARCHING");
+        for(BluetoothDevice pairedDevice : pairedDevices) {
+            if(pairedDevice.getAddress().equals(preferredBluetoothAddress)) {
+                Log.d("Finding paired device", "FOUND");
+                CalculationService.currBluetoothDevice = pairedDevice;
+                break; // Comment out if including paired devices to list.
+            }/* else {
+                bluetoothDevices.add(pairedDevice);
+            }*/
+        }
         bluetoothAddressesShown = new ArrayList<>();
+
         discoverDevices();
 
         final Button button = findViewById(R.id.button);
@@ -573,6 +595,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 routes = directionsParser.parse(jsonObject);
 
                 Log.d("JSON Status", jsonObject.getString("status"));
+                if(!jsonObject.getString("status").equals("OK")) {
+                    Toast.makeText(getApplicationContext(), "OVER_QUERY_LIMIT.", Toast.LENGTH_SHORT).show();
+                    // Restarting app:
+                    Intent i = getBaseContext().getPackageManager().
+                            getLaunchIntentForPackage(getBaseContext().getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -676,18 +707,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //mMap.addPolyline(mapLine);
 
                 if(mapLine != null) {
-                    //mMap.addPolyline(mapLine); // Uncomment this one.
+                    mMap.addPolyline(mapLine); // Uncomment this one.
                     //CalculationService.mapLine = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
                 }
             }
 
             mapAngle = intent.getStringExtra("map angle");
             mapDistance = intent.getStringExtra("map distance");
-            if (mapAngle == "Recalculating.") {
+            if (mapAngle.equals("Recalculating.")) {
                 if(isConnectedWifi()) {
+                    mMap.clear();
+
+                    MarkerOptions markerOptionsStart = new MarkerOptions();
+                    MarkerOptions markerOptionsEnd = new MarkerOptions();
+                    markerOptionsStart.position(currLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    markerOptionsEnd.position(destinationLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    mMap.addMarker(markerOptionsStart);
+                    mMap.addMarker(markerOptionsEnd);
+
+                    Log.d("Recalculation", "Placed Markers.");
+
                     directionsPath.clear();
                     directionsPath.add(currLatLng);
                     directionsPath.add(destinationLatLng);
+
                     String url = getRequestUrl(directionsPath.get(0), directionsPath.get(1));
                     TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
                     taskRequestDirections.execute(url);
@@ -701,6 +744,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // On path:
 
             }
+        } else {
+
+            /*Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
+            for(BluetoothDevice i : bondedDevices) {
+                if(bluetoothAddressesShown.contains(i.getAddress())) {
+                    if(bluetoothAdapter.isDiscovering()) {
+                        bluetoothAdapter.cancelDiscovery();
+                    }
+                    Log.d("Bluetooth", "Already bonded with " + i.getAddress());
+
+                    bluetoothBonded = true;
+                    break;
+                }
+            }*/
         }
     }
 

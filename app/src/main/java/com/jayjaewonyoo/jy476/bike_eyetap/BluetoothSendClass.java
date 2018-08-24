@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class BluetoothSendClass {
     private static final String TAG = "BLUETOOTHSERVICE";
     private static final String appName = "OPENEYETAP";
-    private static final UUID OET_UUID = UUID.fromString("6380f8d1-497a-4143-975d-e4d636cb628e");
+    private static final UUID OET_UUID = UUID.fromString("c9209064-3be0-40ff-868d-d8704abc7984");
 
     private final BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
@@ -94,6 +95,7 @@ public class BluetoothSendClass {
             BluetoothSocket tmp = null;
 
             try {
+                Log.d(TAG, "tmp Established.");
                 tmp = mDevice.createRfcommSocketToServiceRecord(mDevice.getUuids()[0].getUuid());
             }
             catch (IOException e) {
@@ -111,7 +113,7 @@ public class BluetoothSendClass {
 
             // TODO return to scan activity if connection fails
             try {
-                mSocket.connect();
+                mSocket.connect(); // Issue here?
                 Log.d(TAG, "Connection established");
             } catch (IOException e) {
 
@@ -153,6 +155,7 @@ public class BluetoothSendClass {
             mProgressDialog.dismiss();
 
             try {
+                Log.d(TAG, "Sockets established.");
                 tmpIn = mSocket.getInputStream();
                 tmpOut = mSocket.getOutputStream();
             } catch (IOException e) {
@@ -232,7 +235,7 @@ public class BluetoothSendClass {
     public void startClient(BluetoothDevice device, UUID uuid) {
         Log.d(TAG, "Start Client");
 
-        mProgressDialog = ProgressDialog.show(mContext, "Bluetooth", "Bluetooth is connecting", true);
+        //mProgressDialog = ProgressDialog.show(mContext, "Bluetooth", "Bluetooth is connecting", true);
         mConnectThread = new ConnectThread(device, uuid);
         mConnectThread.start();
     }
@@ -284,7 +287,7 @@ public class BluetoothSendClass {
         }
         Log.d(TAG, "Packaged JSON header");
 
-        byte[] headerTextBytes = header.toString().getBytes(Charset.defaultCharset());
+        byte[] headerTextBytes = (header.toString() + "\r\n").getBytes(Charset.defaultCharset());
 
         byte[] byteMessage = formMessage(headerTextBytes, bytes);
 
