@@ -66,6 +66,7 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
             public void run() {
 
                 if(!listCleared) listViewBluetoothDevices.setAdapter(MapsActivity.bluetoothList);
+                prefDevice.setText(MapsActivity.preferredBluetoothName);
 
                 handler.postDelayed(this, CalculationService.interval);
             }
@@ -192,12 +193,14 @@ public class SettingsScreen extends Activity implements AdapterView.OnItemClickL
             MapsActivity.bluetoothAdapter.cancelDiscovery();
         }
 
-        MapsActivity.bluetoothBonded = true;
         MapsActivity.bluetoothDevices.get(i).createBond();
         editor.putString("bluetoothNamePreference", MapsActivity.bluetoothDevices.get(i).getName());
         editor.putString("bluetoothAddressPreference", MapsActivity.bluetoothDevices.get(i).getAddress());
         editor.commit();
-        prefDevice.setText(MapsActivity.bluetoothDevices.get(i).getName());
+
+        MapsActivity.preferredBluetoothName = MapsActivity.bluetoothDevices.get(i).getName();
+        MapsActivity.preferredBluetoothAddress = MapsActivity.bluetoothDevices.get(i).getAddress();
+        //prefDevice.setText(MapsActivity.preferredBluetoothName);
 
         /*if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
             MapsActivity.bluetoothDevices.get(i).createBond();

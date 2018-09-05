@@ -32,11 +32,17 @@ public class BluetoothSendClass {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
 
+    public static boolean connected;
+
+    public static boolean readyToSend;
+
     Context mContext;
 
     public BluetoothSendClass(Context context) {
         mContext = context;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        connected = false;
+        readyToSend = false;
 
         start();
     }
@@ -119,6 +125,7 @@ public class BluetoothSendClass {
 
                 //mSocket.close();
                 cancel();
+                //closeConnections();
 
                 e.printStackTrace();
                 Log.d(TAG, "Connection failed");
@@ -152,7 +159,7 @@ public class BluetoothSendClass {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            mProgressDialog.dismiss();
+            //mProgressDialog.dismiss();
 
             try {
                 Log.d(TAG, "Sockets established.");
@@ -168,6 +175,7 @@ public class BluetoothSendClass {
 
         public void run() {
             Log.d(TAG, "Running Connected Thread");
+            readyToSend = true;
             byte[] buffer = new byte[1024];
 
             int bytes;
@@ -244,6 +252,7 @@ public class BluetoothSendClass {
         Log.d(TAG, "Starting connected");
         mConnectedThread = new ConnectedThread(mSocket);
         mConnectedThread.start();
+        connected = true;
     }
 
     public void closeConnections() {

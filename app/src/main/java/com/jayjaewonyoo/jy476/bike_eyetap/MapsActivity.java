@@ -107,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean directionsShown;
     public LatLng destinationLatLng;
 
+    SharedPreferences.Editor editor;
     public static SharedPreferences sharedPreferences;
     /* The following is the Shared Preferences Structure:
         accelerationPreference      : Whether the acceleration checkbox is checked.
@@ -215,6 +216,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(bondedDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Log.d("Bluetooth Pair", "Bonded.");
 
+                    CalculationService.currBluetoothDevice = bondedDevice;
+
+                    editor.putString("bluetoothNamePreference", bondedDevice.getName());
+                    editor.putString("bluetoothAddressPreference", bondedDevice.getAddress());
+                    editor.commit();
+                    preferredBluetoothAddress = bondedDevice.getAddress();
+                    preferredBluetoothName = bondedDevice.getName();
+
                     // Restarting app:
                     Intent i = getBaseContext().getPackageManager().
                             getLaunchIntentForPackage(getBaseContext().getPackageName());
@@ -227,13 +236,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if(bondedDevice.getBondState() == BluetoothDevice.BOND_NONE) {
                     Log.d("Bluetooth Pair", "Not bonded.");
-                    bluetoothBonded = false;
                 }
             }
         }
     };
-
-    public static boolean bluetoothBonded; // Is the device bonded?
 
     Handler handler = new Handler();
 
@@ -251,6 +257,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         distanceChecked = sharedPreferences.getBoolean("distancePreference", true);
         preferredBluetoothName = sharedPreferences.getString("bluetoothNamePreference", "none");
         preferredBluetoothAddress = sharedPreferences.getString("bluetoothAddressPreference", "none");
+
+        editor = sharedPreferences.edit();
 
         running = false;
         PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
@@ -279,7 +287,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             bluetoothSend = true;
         }
-        bluetoothBonded = false;
         IntentFilter bondIntentFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         registerReceiver(bluetoothBroadcastReceiverBond, bondIntentFilter);
 
@@ -299,11 +306,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(BluetoothDevice pairedDevice : pairedDevices) {
             if(pairedDevice.getAddress().equals(preferredBluetoothAddress)) {
                 Log.d("Finding paired device", "FOUND");
-                CalculationService.currBluetoothDevice = pairedDevice;
+                CalculationService.currBluetoothDevice = bluetoothAdapter.getRemoteDevice(preferredBluetoothAddress);
+                if(CalculationService.currBluetoothDevice != null) {
+                    Log.d("Finding paired device", "SUCCESSS");
+                    Log.d("Paired device is", CalculationService.currBluetoothDevice.getName());
+                }
                 break; // Comment out if including paired devices to list.
-            }/* else {
-                bluetoothDevices.add(pairedDevice);
-            }*/
+            }
         }
         bluetoothAddressesShown = new ArrayList<>();
 
@@ -595,8 +604,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 routes = directionsParser.parse(jsonObject);
 
                 Log.d("JSON Status", jsonObject.getString("status"));
-                if(!jsonObject.getString("status").equals("OK")) {
+                if(!(jsonObject.getString("status").equals("OK"))) {
                     Toast.makeText(getApplicationContext(), "OVER_QUERY_LIMIT.", Toast.LENGTH_SHORT).show();
+                    startService(intent);
+                    running = false;
                     // Restarting app:
                     Intent i = getBaseContext().getPackageManager().
                             getLaunchIntentForPackage(getBaseContext().getPackageName());
@@ -754,7 +765,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     Log.d("Bluetooth", "Already bonded with " + i.getAddress());
 
-                    bluetoothBonded = true;
                     break;
                 }
             }*/
@@ -810,11 +820,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
-        if(preferredBluetoothAddress != "none" && !bluetoothBonded) {
+        if(preferredBluetoothAddress != "none") {
             for(int i = 0; i < bluetoothAddressesShown.size(); i++) {
                 if(bluetoothAddressesShown.get(i).equals(preferredBluetoothAddress)) {
                     bluetoothDevices.get(i).createBond();
-                    bluetoothBonded = true;
                     break;
                 }
             }

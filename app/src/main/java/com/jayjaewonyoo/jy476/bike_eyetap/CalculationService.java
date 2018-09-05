@@ -95,6 +95,8 @@ public class CalculationService extends Service implements SensorEventListener {
     public static BluetoothDevice currBluetoothDevice;
     BluetoothSendClass bluetoothSendClass;
 
+    private int count;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -148,11 +150,14 @@ public class CalculationService extends Service implements SensorEventListener {
 
         //runningService = !runningService;
         if(runningService) {
+            if(bluetoothSendClass != null) bluetoothSendClass.closeConnections();
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         } else {
             requestLocationUpdates();
             startBluetooth();
             directionPoints = MapsActivity.directionsLine.getPoints();
+
+            count = 0;
         }
         runningService = !runningService;
         mapLine = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
@@ -165,6 +170,12 @@ public class CalculationService extends Service implements SensorEventListener {
         handler.postDelayed(sendToUI, interval);
 
         return Service.START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(bluetoothSendClass != null) bluetoothSendClass.closeConnections();
     }
 
     private Runnable sendToUI = new Runnable() {
@@ -316,7 +327,11 @@ public class CalculationService extends Service implements SensorEventListener {
 
             tempLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-            sendBluetooth("Angle", "EyeTap_Navigation", angleString, "");
+            if(count == 10) {
+                sendBluetooth("Angle", "EyeTap_Navigation", angleString, "");
+                count = 0;
+            }
+            else count++;
 
             sendBroadcast(intent);
         }
@@ -431,9 +446,11 @@ public class CalculationService extends Service implements SensorEventListener {
     }
 
     private void sendBluetooth(String title, String pack, String text, String img) {
-        if(MapsActivity.bluetoothSend && MapsActivity.bluetoothBonded) {
+        if(MapsActivity.bluetoothSend && BluetoothSendClass.readyToSend) {
             JSONObject sentPackage = new JSONObject();
             try {
+                //Log.d("BluetoothSend", "Trying");
+
                 sentPackage.put("title", title);
                 sentPackage.put("package", pack);
                 sentPackage.put("text", text);

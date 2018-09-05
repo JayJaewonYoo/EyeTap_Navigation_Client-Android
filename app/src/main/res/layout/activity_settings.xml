@@ -20,14 +20,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="3.5"
         android:weightSum="3"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:weightSum="3"
             android:orientation="horizontal">
 
@@ -45,11 +45,26 @@
                 android:text="Clear Devices"
                 android:onClick="clearBluetoothList" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:id="@+id/currDevice"/>
+                android:weightSum="3"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="Preferred Device:"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:id="@+id/currDevice"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -57,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/listViewDevices"
-            android:layout_weight="2"/>
+            android:layout_weight="2.5"/>
 
     </LinearLayout>
 
@@ -65,7 +80,7 @@
         android:name="checkboxes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="1.5"
         android:weightSum="3.4"
         android:orientation="vertical" >
 
