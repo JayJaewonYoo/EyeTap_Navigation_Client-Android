@@ -37,18 +37,30 @@
             android:layout_height="match_parent"
             android:layout_width="0dp"
             android:layout_weight="3"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_layout"
+            android:layout_margin="5dp"
+            android:elevation="1dp"
             android:text="@string/buttonStart" />
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Values"
+            android:text="Data"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_layout"
+            android:layout_margin="5dp"
+            android:elevation="1dp"
             android:onClick="mapToValues"/>
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Settings"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_layout"
+            android:layout_margin="5dp"
+            android:elevation="1dp"
             android:onClick="mapToSettings"/>
     </LinearLayout>
 </LinearLayout>

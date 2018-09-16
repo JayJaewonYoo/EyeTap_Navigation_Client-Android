@@ -36,6 +36,10 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Discover Devices"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_layout"
+                android:layout_margin="5dp"
+                android:elevation="1dp"
                 android:onClick="discoverBluetoothButton" />
 
             <Button
@@ -43,12 +47,17 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Clear Devices"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_layout"
+                android:layout_margin="5dp"
+                android:elevation="1dp"
                 android:onClick="clearBluetoothList" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginTop="10dp"
                 android:weightSum="3"
                 android:orientation="vertical">
 
@@ -176,13 +185,21 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:text="Map"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_layout"
+            android:layout_margin="5dp"
+            android:elevation="1dp"
             android:onClick="settingsToMap"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Values"
+            android:text="Data"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_layout"
+            android:layout_margin="5dp"
+            android:elevation="1dp"
             android:onClick="settingsToValues"/>
     </LinearLayout>
 </LinearLayout>

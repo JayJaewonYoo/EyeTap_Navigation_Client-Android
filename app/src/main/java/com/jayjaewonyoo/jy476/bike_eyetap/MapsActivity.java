@@ -275,8 +275,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         distance = "0.00";
         avgSpeed = "0.00";
         time = "0.00";
-        mapAngle = "Waiting";
-        mapDistance = "Waiting";
+        mapAngle = "???";
+        mapDistance = "???";
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothSend = true;
@@ -355,8 +355,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             distance = "0.00";
                             avgSpeed = "0.00";
                             time = "0.00";
-                            mapAngle = "Waiting";
-                            mapDistance = "Waiting";
+                            mapAngle = "???";
+                            mapDistance = "???";
 
                             button.setText(R.string.buttonStop);
                             running = true;
@@ -510,7 +510,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String stringStart = "origin=" + start.latitude + "," + start.longitude;
         String stringEnd = "destination=" + end.latitude + "," + end.longitude;
         String stringSensor = "sensor=false";
-        String stringMode = "mode=bicycling"; //mode=walking
+        String stringMode = "mode=walking"; //mode=bicycling
         String param = stringStart + "&" + stringEnd + "&" + stringSensor + "&" + stringMode;
         String output = "json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
