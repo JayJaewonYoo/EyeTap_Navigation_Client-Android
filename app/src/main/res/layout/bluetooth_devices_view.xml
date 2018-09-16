@@ -4,18 +4,20 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/list_item_boundary">
+    android:background="@drawable/button_layout">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDeviceName"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDeviceAddress"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"/>
 
 </LinearLayout>
