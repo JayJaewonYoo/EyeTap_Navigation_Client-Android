@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -127,6 +128,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static boolean distanceChecked;
     public static String preferredBluetoothName;
     public static String preferredBluetoothAddress;
+    
+    private String jsonStatus;
 
     public static boolean bluetoothSend; // Does user want to send Bluetooth data?
     public static BluetoothAdapter bluetoothAdapter;
@@ -277,6 +280,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         time = "0.00";
         mapAngle = "???";
         mapDistance = "???";
+        
+        jsonStatus = "OK";
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothSend = true;
@@ -387,10 +392,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
-        unregisterReceiver(bluetoothBroadcastReceiverEnable);
-        unregisterReceiver(bluetoothBroadcastReceiverEnableDiscoverable);
-        unregisterReceiver(bluetoothBroadcastReceiverDiscover);
-        unregisterReceiver(bluetoothBroadcastReceiverBond);
+        try {
+            unregisterReceiver(bluetoothBroadcastReceiverEnable);
+        } catch(Exception e) {
+
+        }
+        try {
+            unregisterReceiver(bluetoothBroadcastReceiverEnableDiscoverable);
+        } catch(Exception e) {
+
+        }
+        try {
+            unregisterReceiver(bluetoothBroadcastReceiverDiscover);
+        } catch(Exception e) {
+
+        }
+        try {
+            unregisterReceiver(bluetoothBroadcastReceiverBond);
+        } catch(Exception e) {
+
+        }
     }
 
     @Override
@@ -604,16 +625,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 routes = directionsParser.parse(jsonObject);
 
                 Log.d("JSON Status", jsonObject.getString("status"));
-                if(!(jsonObject.getString("status").equals("OK"))) {
-                    Toast.makeText(getApplicationContext(), "OVER_QUERY_LIMIT.", Toast.LENGTH_SHORT).show();
-                    startService(intent);
-                    running = false;
-                    // Restarting app:
-                    Intent i = getBaseContext().getPackageManager().
-                            getLaunchIntentForPackage(getBaseContext().getPackageName());
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
+                try {
+                    if (!(jsonObject.getString("status").equals("OK"))) {
+                        jsonStatus = jsonObject.getString("status");
+                        
+                        running = false;
+                        // Restarting app:
+                        /*Intent i = getBaseContext().getPackageManager().
+                                getLaunchIntentForPackage(getBaseContext().getPackageName());
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);*/
+                    }
+                } catch(JSONException e) {
+                    Log.d("JSON Status", "failed");
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -643,7 +668,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addPolyline(directionsLine);
                 Toast.makeText(getApplicationContext(), "App is now ready.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplicationContext(), "Direction not found.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), jsonStatus, Toast.LENGTH_SHORT).show();
+                directionsShown = false;
             }
             computingPath = false;
         }

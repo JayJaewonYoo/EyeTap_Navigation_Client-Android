@@ -277,7 +277,7 @@ public class CalculationService extends Service implements SensorEventListener {
                     if (directionPoints.size() == 0) {
                         angleString = "Reached";
                         distanceMapString = "0.00";
-                    } else if(currDistanceDifference > 70) {
+                    } else if(currDistanceDifference > 100) {
                         angleString = "Recalculating.";
                         distanceMapString = "Recalculating.";
                     } else {

@@ -333,7 +333,7 @@
             android:layout_margin="5dp"
             android:elevation="1dp"
             android:onClick="valuesToMap"/>
-        <Button
+        <ImageButton
             android:id="@+id/valuesToSettingsButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -343,7 +343,8 @@
             android:background="@drawable/button_layout"
             android:layout_margin="5dp"
             android:elevation="1dp"
-            android:onClick="valuesToSettings"/>
+            android:onClick="valuesToSettings"
+            android:src="@drawable/ic_gear"/>
     </LinearLayout>
 
 </LinearLayout>
